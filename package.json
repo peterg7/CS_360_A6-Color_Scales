@@ -1,0 +1,23 @@
+{
+  "name": "a6",
+  "version": "1.0.0",
+  "description": "Color scales in d3",
+  "main": "server.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"No test currently implemented\"",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/peterg7/CS_360_A6-Color_Scales.git"
+  },
+  "author": "Peter Gish",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/peterg7/CS_360_A6-Color_Scales/issues"
+  },
+  "homepage": "https://github.com/peterg7/CS_360_A6-Color_Scales#readme"
+}
