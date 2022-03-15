@@ -6,6 +6,7 @@
 # Datasets
 data/*
 !data/transformed
+!data/share-elec-produc-by-source.csv
 
 # Workspaces
 *.code-workspace
