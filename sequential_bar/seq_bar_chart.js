@@ -58,7 +58,7 @@ const yParams = {
 yParams.axis = d3.axisLeft()
     .scale(yParams.scale)
     .tickPadding(yParams.tickPadding)
-    .tickFormat(d3.format('.2f'))
+    .tickFormat(d3.format('.1f'))
     .tickSize(-SCREEN_DIMENSIONS.innerWidth)
 
 

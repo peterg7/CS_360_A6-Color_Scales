@@ -1,20 +1,55 @@
+
+/* body { margin:0; position:fixed; top:0; right:0; bottom:0; left:0; }
+    
+body {
+  font-family: monospace;
+}
+
+.y-axis line{
+  stroke: black;
+}
+
+.annual-growth {
+  fill: black;
+}
+
+.bar-label, .x-axis {
+  font-size: 8px;
+}
+
+.domain, .tick line {
+  opacity: 0.5;
+} */
+
+
+
+
+
+
+
 svg {
     font: 10px sans-serif;
-    padding: 10px;
+    padding: 5px;
 }
 body {
-    margin: 15px;
+    margin: 5px;
+    position: fixed;
 }
 .bar {
     outline: 5px blue;
 }
-.axis line {
-    stroke: #ddd;
+.bar-label {
+    font-size: 8px;
 }
 
-.axis path {
-    display: none;
+.y-axis line{
+    stroke: rgb(155, 155, 155);
 }
+
+.x-axis line {
+    stroke: rgb(155, 155, 155);
+}
+
 
 .frame {
     fill: none;
@@ -22,30 +57,41 @@ body {
     shape-rendering: crispEdges;
 }
 .domain {
-    display: none;
+    stroke: rgb(155, 155, 155);
 }
 .tick line {
-    stroke: #C0C0BB;
+    stroke: rgb(155, 155, 155);
 }
 .tick text {
     fill: #8E8883;
-    font-size: 10pt;
+    font-size: 8pt;
     font-family: sans-serif;
 }
-
+.legend-tick line {
+    stroke: rgb(155, 155, 155);
+    stroke-width: 1.5px;
+}
+.legend-title {
+    font-size: 9ptx;
+}
+.legend-label {
+    font-size: 7ptx;
+    color:  rgb(155, 155, 155);
+    text-align: right;
+}
 .title {
     text-anchor: middle;
-    font-size: 20px;
+    font-size: 18px;
     text-decoration: underline;
 }
 .x-axis-label {
     fill: #635F5D;
-    font-size: 14pt;
+    font-size: 11pt;
     font-family: sans-serif;
 }
 .y-axis-label {
     fill: #635F5D;
-    font-size: 14pt;
+    font-size: 11pt;
     font-family: sans-serif;
     transform: rotate(-90deg);
 }

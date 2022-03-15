@@ -1,4 +1,5 @@
-// NOTE: Referenced 
+// NOTE: Referenced https://observablehq.com/@d3/diverging-stacked-bar-chart
+//                  https://bl.ocks.org/tlfrd/187e45e0629711c4560cf6bcd0767b27
 
 
 // set the dimensions and margins of the graph
@@ -40,78 +41,85 @@ const columnTranslations = new Map([
  * 
  * x -> fooprint_ratio
  * y -> Entity (country)
- * z -> source
+ * z (color) -> source
  */
 
 
 const xParams = {
     value: row => row.footprint,
     label: 'Footprint (cons / prod)',
-    scale: d3.scaleBand(),
+    // scale: d3.scaleBand(),
     tickPadding: 5
 };
-xParams.axis = d3.axisBottom()
-    .scale(xParams.scale)
-    .tickPadding(xParams.tickPadding)
-    .tickFormat(d3.format('+%'))
-    .tickSize(-SCREEN_DIMENSIONS.innerHeight);
+// xParams.axis = d3.axisBottom()
+//     .scale(xParams.scale)
+//     .tickPadding(xParams.tickPadding)
+//     .tickFormat(d3.format('+%'))
+//     .tickSize(-SCREEN_DIMENSIONS.innerHeight);
 
 const yParams = {
     value: row => row.country,
     label: 'Country',
-    scale: d3.scaleLinear(),
+    // scale: d3.scaleLinear(),
     tickPadding: 5
 };
-yParams.axis = d3.axisLeft()
-    .scale(yParams.scale)
-    .tickPadding(yParams.tickPadding)
-    .tickFormat(d3.format('.2f'))
-    .tickSize(-SCREEN_DIMENSIONS.innerWidth)
+// yParams.axis = d3.axisLeft()
+//     .scale(yParams.scale)
+//     .tickPadding(yParams.tickPadding)
+//     .tickFormat(d3.format('.2f'))
+//     .tickSize(-SCREEN_DIMENSIONS.innerWidth)
 
 
 const colorParams = {
     value: row => row.source
 } 
 
+const colorArray = d3.schemeTableau10;
+const stackOffset = d3.stackOffsetDiverging // stack offset method
+const stackOrder = (series) => { // stack order method; try also d3.stackOffsetNone
+    return [ // by default, stack negative series in reverse order
+        ...series.map((S, i) => S.some(([, y]) => y < 0) ? i : null).reverse(),
+        ...series.map((S, i) => S.some(([, y]) => y < 0) ? null : i)
+    ].filter(i => i !== null);
+}
+
 const canvas = svg.append('g')
     .attr('transform', `translate(${SCREEN_DIMENSIONS.leftMargin},${SCREEN_DIMENSIONS.topMargin})`);
 
-const xAxisGroup = canvas.append('g')
-    .attr('transform', `translate(0, ${SCREEN_DIMENSIONS.innerHeight})`);
+// const xAxisGroup = canvas.append('g')
+//     .attr('transform', `translate(0, ${SCREEN_DIMENSIONS.innerHeight})`);
 
-const yAxisGroup = canvas.append('g');
+// const yAxisGroup = canvas.append('g');
 
-const titleGroup = canvas.append("text")
-    .attr('transform', `translate(${(SCREEN_DIMENSIONS.innerWidth / 2)},${0 - (SCREEN_DIMENSIONS.topMargin * 1.35)})`)
-    .attr("class", "title")
-    .text("US Energy Production (Solar vs. Oil) 2010-2020");
+// const titleGroup = canvas.append("text")
+//     .attr('transform', `translate(${(SCREEN_DIMENSIONS.innerWidth / 2)},${0 - (SCREEN_DIMENSIONS.topMargin * 1.35)})`)
+//     .attr("class", "title")
+//     .text("US Energy Production (Solar vs. Oil) 2010-2020");
 
-const legendGroup = canvas.append('g')
-    .attr("transform", `translate(${SCREEN_DIMENSIONS.innerWidth + SCREEN_DIMENSIONS.rightMargin / 5},${SCREEN_DIMENSIONS.topMargin * 2})`)
-    .attr("class", "legendSequential");
+// const legendGroup = canvas.append('g')
+//     .attr("transform", `translate(${SCREEN_DIMENSIONS.innerWidth + SCREEN_DIMENSIONS.rightMargin / 5},${SCREEN_DIMENSIONS.topMargin * 2})`)
+//     .attr("class", "legendSequential");
 
-xAxisGroup.append('text')
-    .attr('class', 'x-axis-label')
-    .attr('x', SCREEN_DIMENSIONS.innerWidth / 2)
-    .attr('y', 50)
-    .text(xParams.label);
+// xAxisGroup.append('text')
+//     .attr('class', 'x-axis-label')
+//     .attr('x', SCREEN_DIMENSIONS.innerWidth / 2)
+//     .attr('y', 50)
+//     .text(xParams.label);
 
-yAxisGroup.append('text')
-    .attr('class', 'y-axis-label')
-    .attr('x', -SCREEN_DIMENSIONS.topMargin * 5.5)
-    .attr('y', -SCREEN_DIMENSIONS.leftMargin * 1.75)
-    .text(yParams.label);
+// yAxisGroup.append('text')
+//     .attr('class', 'y-axis-label')
+//     .attr('x', -SCREEN_DIMENSIONS.topMargin * 5.5)
+//     .attr('y', -SCREEN_DIMENSIONS.leftMargin * 1.75)
+//     .text(yParams.label);
 
 
 const preprocess = (row, i) => {
-
     let filtered = d => { 
         let yr = parseInt(d['Year']) 
         return Object.values(d).includes(null) ||
                     yr < MIN_YEAR || yr > MAX_YEAR ||
                     Object.values(d).includes(-1) // represents infinity (invalid)
     };
-
     return !filtered(row) ? Object.fromEntries(
         Array.from(columnTranslations.entries())
             .map(([key, val]) => {
@@ -138,6 +146,8 @@ d3.csv(DATA_LOC, preprocess).then((data, i) => {
     let randomCountries = shuffledCountries.slice(0, Math.min(shuffledCountries.length, NUM_COUNTRIES));
     let sampleData = data.filter(a => randomCountries.includes(a.country))
     let groupedSampleData = groupBy(sampleData, 'country')
+
+
     // Compute values.
     const X = d3.map(sampleData, xParams.value);
     const Y = d3.map(sampleData, yParams.value);
@@ -149,16 +159,13 @@ d3.csv(DATA_LOC, preprocess).then((data, i) => {
     let yDomain = new Set(d3.groupSort(sampleData, D => d3.sum(D, d => -Math.min(0, xParams.value(d))), d => yParams.value(d)))
     let zDomain = new Set(sampleData.map(a => a.source))
 
+
+
     // Omit any data not present in the y- and z-domains.
     const I = d3.range(X.length).filter(i => yDomain.has(Y[i]) && zDomain.has(Z[i]));
-    const colorArray = d3.schemeTableau10;
-    const stackOffset = d3.stackOffsetDiverging // stack offset method
-    const stackOrder = (series) => { // stack order method; try also d3.stackOffsetNone
-        return [ // by default, stack negative series in reverse order
-          ...series.map((S, i) => S.some(([, y]) => y < 0) ? i : null).reverse(),
-          ...series.map((S, i) => S.some(([, y]) => y < 0) ? null : i)
-        ].filter(i => i !== null);
-      }
+
+
+    
 
     
     // Compute a nested array of series where each series is [[x1, x2], [x1, x2],
